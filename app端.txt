@@ -1,0 +1,61 @@
+1.项目启动
+  首先要启动nginx,nginx作用是反向代理,Nginx就是性能非常好的反向代理服务器，用来做负载均衡。反向代理服务器会帮我们把请求转发到真实的服务器那里去。
+  安装好nginx文件后再conf文件中有个nginx.conf里面有反向代理配置的地址
+  启动
+   01 APPserver、根目录，node bin/99api
+   02 nginx .exe文件双击
+   03 red 根目录 （1）redis-server.exe redis.windows.conf
+	         （2）redis-cli
+2.项目每个文件的路径:放在D:\nginx\html\invest-app
+
+3.html要注意的地方:无
+4.css要注意的地方:background:url(../images/invest-app/bg.jpg) center center no-repeat;
+	          background-size: cover(背景图片自适应,app端要加这句代码)
+5.js要注意的地方:
+  //不同屏幕下的适配
+  var height=screen.height;
+  if(height<667){//当前设备小于iphone6时候
+	$(".flow").css("height","3.15rem");
+	$(".lingqu span").css("margin-bottom",0);
+	$('.closers').css("left","0.84rem").css("top","-0.99rem");
+  }
+  if(height<=568){//当前设备小于iphone5时候
+    // $(".btn-items li").css("height","1.5rem");
+    $(".pop-item2").css("padding","0 0.2rem 0.3rem 0.2rem");
+    $(".pop-item2 .closer").css("left","0.02rem");
+    $('.closers').css("left","0.94rem").css("top","-1.12rem");
+  }
+  
+  //封装一个轮播的函数调用
+function rollRecord(data){
+    var html="";
+    var arr=data.list;
+      for(var i=0,len=arr.length;i<len;i++){ //遍历的时候用一个变量把数组长度接住,这样避免多次layout
+        var nameDefault=arr[i].uname;
+            arr[i].uname=nameDefault.slice(0,1) + '**';//例如得到的name为Lsjjx,要变成L**;
+        var time=arr[i].time*1000;//从后段获得时间毫秒数,转化为  08-20 15:30
+            time=new Date(time);
+        var d=time.getDate();
+        var h=time.getHours();
+        var m=time.getMinutes();
+        var M=time.getMonth()+1;
+        var Arr=[d,h,M,m];
+            for(var j=0;j<Arr.length;j++){
+              if(Arr[j]<10){
+                Arr[j]="0"+Arr[j];
+              }
+            }
+        arr[i].time=Arr[2]+"-"+Arr[0]+" "+'&nbsp;'+Arr[1]+":"+Arr[3]; 
+        html+='<li class="items-cate clear"><p class="uname center">'+arr[i].uname+'</p><p class="pname center">获得'+arr[i].pname+'</p><p class="center utime">'+arr[i].time+'</p></li>';
+
+    }
+    return html;
+}
+//轮播请求 调用函数(用户没有登录时候也可以显示)
+  APPInterFace.APIClient.addAction("happyBegin/Rainking",{event_id:7}).request(function(){
+    var res=this.getResultByAction("happyBegin/Rainking").content;
+    // console.log(res);
+    $(".items").html(rollRecord(res));
+  });
+
+

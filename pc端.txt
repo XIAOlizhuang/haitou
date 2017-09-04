@@ -1,0 +1,165 @@
+1.项目启动:在D:\svn\1 Dev\03code\java的play-1.4.4中打开命令行窗口,启动pc端的99财富官网，自己的活动页面就会在最新活动中显示。 play run ../sp2p_xzox.main.启动项目 在浏览器输入localhost:9002
+		play框架是后端Java的一个框架。运用了mvc思想。将项目分为层的形式。当请求数据的时候,配置路由会找到控制器层,然后控制器和数据库打交道。
+		另外补充一点:play-1.4.4内有可执行文件 .bat文件后缀所以运行play文件时候最好是配置环境变量，这样在任何一个路径下都可以执行play命令。
+		(类似于node下载也要在系统变量的path路径中配置D:\Node.js\环境变量)
+		所以启动这个项目还可以直接进入sp2p_xzox.main	输入play run即可，也可以在其上一级输入	play run sp2p_xzox.main											     
+2.项目每个文件的路径
+  html:  D:\svn\1 Dev\03code\java\sp2p_xzox.main\app\views\events\EventsCtrl.建一个html文件命名要有Pre后缀。
+  css:   D:\svn\1 Dev\03code\java\sp2p_xzox.main\public\css\event下
+  images:D:\svn\1 Dev\03code\java\sp2p_xzox.main\public\images\event要先建一个文件夹名
+  js    :D:\svn\1 Dev\03code\java\sp2p_xzox.main\public\js\event要先建一个文件夹名。公共的js文件就不要放入
+
+3.html要注意的地方:
+      #{extends 'common/frontMain.html' /} 
+      #{set title:'嗨投领红包' /}
+      #{set smallclass:0 /}
+      去掉head body等换成以上部分.
+      <!--[if lt IE 9]>
+      <style type="text/css">
+       .popup{
+            background:#000;
+            filter:Alpha(opacity=80);
+       } 
+     </style>
+     <![endif]-->   IE8不支持background:rgba(0,0,0,0.8);黑色透明背景,在html的head文件中写
+     或者在css样式中写 .pop{background: #000;opacity:0.8;filter:Alpha(opacity=80);}这样也可以。过滤器支持IE8 opacity不支持.所以在读取的时候遇到兼容性会读后者
+	
+4.css要注意的地方:
+  01.公共的css样式如下:
+  @charset "utf-8";
+  *{
+	margin:0;
+	padding:0;
+	box-sizing: border-box;
+   }
+  ol,ul,textarea{list-style-type:none;}
+  a { text-decoration: none;color:#000; }
+  a { outline: none; }
+  .lt { float: left; }
+  .rt { float: right; }
+  .center{
+     text-align: center
+    }
+  .right{
+     text-align: right
+    }
+  .clear:after{
+    content: '';
+    display: block;
+    clear: both;
+  }//父元素高度由内部元素决定,尽量不要给固定的高
+  02.某个元素植入背景图片:
+	width:xx px;
+	height:xx px;
+	background:url(/images/rule.png) no-repeat
+	(注:pc端不用谢background-size属性.移动端需要些)
+  03.   border-radius: 10px;
+	-webkit-border-radius: 10px;
+	-ms-border-radius:10px;
+	-moz-border-radius:10px;兼容IE8
+  04. 弹窗的样式
+    .popup{
+	display: none;
+	width:100%;
+	height: 100%;
+	position: fixed;
+	z-index: 10;
+	top:0;
+	left:0;
+	background: #000;
+	opacity:0.8;
+	filter:Alpha(opacity=80);
+    }//这个是透明背景,颜色为#000;
+    .pop-btn{
+	display: none;
+	width:100%;
+	position: fixed;
+	z-index:11
+	top:50%;
+	margin-top:-111px;//高的一半
+     }
+    .pop-public3{
+	text-align: center;
+	width:400px;
+	padding:45px 84px;
+	border-radius:22px;
+	-webkit-border-radius: 22px;
+	-ms-border-radius:22px;
+	-moz-border-radius:22px;
+	border:3px solid #000;
+	background: #E23F36;
+	margin:0 auto;
+   }
+
+ js要注意的地方:
+ //弹框的show与hide
+function Show(ide){//html元素的标签中可以直接写 <span onclick="Show(弹出框的id)"><span>
+	var qa=document.getElementById(ide);
+	qa.style.display="block";
+	document.getElementById('blackbg').style.display="block";
+}
+function exit(ide){
+	var qa=document.getElementById(ide);
+	qa.style.display="none";
+	document.getElementById('blackbg').style.display="none";
+}
+
+//鼠标移入移出事件(一般情况下用css的:hover就可以实现，除非稍微复杂点的或者有动画效果可以用js中的onmouseenter)
+function mouseEnter(ide){ //html元素的标签中可以直接写onmouseenter="mouseEnter('#th1')" 
+	$(ide).find(".money1").css({'display':'none'});
+	$(ide).find(".money2").css({'display':'block'});
+}
+function mouseout(ide){//html元素的标签中可以直接写onmouseleave="mouseout('#th1')"
+	$(ide).find(".money1").css({'display':'block'});
+	$(ide).find(".money2").css({'display':'none'});
+}
+
+function lunbo(id,height){//用户奖励轮播
+  var ul=$(id);
+  var liFirst=ul.find('li:first');//ul下的li项循环
+  $(id).animate({top:height}).animate({"top":0},0,function(){//利用jquery中的动画函数
+  var clone=liFirst.clone();
+  //第一项踹回去
+  $(id).append(clone);
+  liFirst.remove();
+  })
+ }
+ setInterval("lunbo('#item1','-60px')",2000);
+
+
+//ajax请求标准 (注:如果有多次用到相同的函数的时候一定要进行封装调用,提高代码重复使用率)
+//另外 ajax请求数据库的时候会有url路径,这是因为在sp2p_xzox.main下有个conf配置文件,application.conf文件有
+                                                                                                # 数据库连接
+                                                                                                # ~~~~~ 
+                                                                                                db=mysql://root:574664@192.168.1.238/xzox。这个地址是远程服务器地址
+$("#three-month").on('click',function(){
+	$.ajax({
+		type:"GET",
+		dataType:"json",
+		url:"/events/eachInvestMoney.html",
+		data:{
+			event_id:7,
+			period:3
+		},
+		success:function(data){
+			// console.log(data,typeof data.code);
+			if(data.code==-2){
+				location.href="/loginAndRegiste/login.html";
+			}
+			else if(data.code==-1) Show('pop-invest-three');
+			else{
+				// console.log(data);
+				var html="";
+				var html2="";
+		    	var arr=data.obj;
+		    	for(var i=0,len=arr.length;i<len;i++){
+		    		html+='<p>'+arr[i].money+'元</p>';
+		    		html2+='<p>'+arr[i].time+'元</p>';
+		    		$("#three-money").html(html);
+		    		$("#three-time").html(html2);
+				}
+				Show('pop-invest-three');
+			}
+		}
+	})
+}) 
