@@ -47,7 +47,7 @@ function rollRecord(data){
             }
         arr[i].time=Arr[2]+"-"+Arr[0]+" "+'&nbsp;'+Arr[1]+":"+Arr[3]; 
         html+='<li class="items-cate clear"><p class="uname center">'+arr[i].uname+'</p><p class="pname center">获得'+arr[i].pname+'</p><p class="center utime">'+arr[i].time+'</p></li>';
-
+	//html=``;IE8不支持所以不能用es6中的语法小撇符号.s
     }
     return html;
 }
